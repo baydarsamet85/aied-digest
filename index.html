@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="Lead AI Be — Weekly AI in Education digest for faculty developers and instructional designers in higher education"/>
+<title>Lead AI Be · AI in Education Weekly</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#CFB991;--gd:#a8915c;--gb:rgba(207,185,145,.12);--bg:#080d14;--su:#0f1623;--su2:#161f2e;--bo:#1e2d42;--tx:#f1f5f9;--mu:#7a8ba5}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,sans-serif;padding-bottom:80px;line-height:1.6}
+a{color:inherit}
+/* Header */
+.hdr{background:var(--su);border-bottom:2px solid var(--gd)}
+.hdr-in{max-width:1200px;margin:0 auto;padding:22px 24px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.pub-nm{font-size:32px;font-weight:900;letter-spacing:-0.04em;color:var(--gold);line-height:1}
+.pub-sb{font-size:11px;color:var(--mu);margin-top:6px;letter-spacing:.1em;text-transform:uppercase}
+.hdr-rt{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.pub-dt{font-size:12px;color:var(--mu)}
+.bdg{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.bl{background:rgba(74,222,128,.15);color:#4ade80}.bk{background:rgba(167,139,250,.15);color:#a78bfa}
+/* Layout */
+.main{max-width:1200px;margin:0 auto;padding:36px 24px 0}
+/* Intro */
+.intro{background:var(--su);border-left:3px solid var(--gold);border-radius:10px;padding:16px 20px;margin-bottom:40px;font-size:15px;line-height:1.75;color:#c8d4e0;font-style:italic}
+/* Category */
+.cat-sec{margin-bottom:52px}
+.cat-hdr{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;background:var(--su);border-radius:12px;margin-bottom:18px}
+.cat-ico{font-size:22px;margin-top:2px;flex-shrink:0}
+.cat-nm{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.cat-sig{font-size:13.5px;color:var(--mu);line-height:1.5}
+.why{margin-top:14px;padding:12px 16px;background:var(--su);border-radius:8px;font-size:13px;color:var(--mu);font-style:italic;line-height:1.65}
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:960px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:580px){.grid{grid-template-columns:1fr}}
+/* Flip card */
+.fc{perspective:1000px;min-height:220px;cursor:pointer}
+.fc:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:12px}
+.fi{position:relative;width:100%;min-height:220px;transform-style:preserve-3d;transition:transform .58s cubic-bezier(.4,0,.2,1)}
+.fc.flipped .fi{transform:rotateY(180deg)}
+.ff,.fb{position:absolute;inset:0;backface-visibility:hidden;background:var(--su);border:1px solid var(--bo);border-radius:12px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.fb{transform:rotateY(180deg);overflow-y:auto}
+.cs{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.ch{font-size:14px;font-weight:700;line-height:1.4;color:var(--tx)}
+.ch.sm{font-size:12.5px}
+.hint{font-size:11px;color:var(--mu);font-style:italic;margin-top:auto}
+.det{font-size:12.5px;line-height:1.65;color:var(--mu)}
+.rl{display:block;margin-top:auto;padding-top:10px;font-size:12px;font-weight:800;text-decoration:none;letter-spacing:.03em}
+.rl:hover{text-decoration:underline}
+/* Divider */
+.div{height:1px;background:linear-gradient(90deg,transparent,var(--bo),transparent);margin:52px 0}
+/* Editor's Pick */
+.ep{background:linear-gradient(135deg,#110e00,#0a1020);border:2px solid var(--gold);border-radius:16px;padding:28px 32px;margin-bottom:36px}
+.ep-lbl{font-size:10px;font-weight:900;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:12px}
+.ep-hl{font-size:20px;font-weight:900;color:#f5e9d0;margin-bottom:14px;line-height:1.25;letter-spacing:-.01em}
+.ep-dt{font-size:14px;line-height:1.8;color:#c0a878;margin-bottom:16px}
+.ep-ft{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.ep-src{font-size:11px;font-weight:700;color:var(--gd);background:var(--gb);border-radius:4px;padding:3px 9px}
+.ep-lk{font-size:13px;font-weight:800;color:var(--gold);text-decoration:none}
+.ep-lk:hover{text-decoration:underline}
+/* Sections */
+.sec-wrap{margin-bottom:52px;padding-top:20px;border-top:1px solid var(--bo)}
+.sec-ttl{font-size:22px;font-weight:900;color:var(--gold);letter-spacing:-.02em;margin-bottom:6px}
+.sec-sub{font-size:13px;color:var(--mu);margin-bottom:26px}
+/* Showcase */
+.show-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
+@media(max-width:580px){.show-grid{grid-template-columns:1fr}}
+.show-card{background:var(--su);border:1px solid var(--bo);border-radius:14px;overflow:hidden}
+.show-ph{width:100%;height:200px;object-fit:cover;display:block}
+.show-ini{width:100%;height:180px;background:var(--gb);display:flex;align-items:center;justify-content:center;font-size:64px;font-weight:900;color:var(--gold)}
+.show-info{padding:18px 20px}
+.show-nm{font-size:17px;font-weight:800;margin-bottom:4px}
+.show-tl{font-size:12px;color:var(--gold);font-weight:600;margin-bottom:10px;letter-spacing:.02em}
+.show-bio{font-size:13px;color:var(--mu);line-height:1.65}
+.show-vid{position:relative;padding-top:56.25%}
+.show-vid iframe{position:absolute;inset:0;width:100%;height:100%}
+.show-fl{display:block;margin:16px 20px;padding:10px 16px;background:var(--gb);border:1px solid var(--gd);border-radius:8px;color:var(--gold);font-weight:700;font-size:13px;text-align:center;text-decoration:none}
+.show-fl:hover{background:rgba(207,185,145,.22)}
+/* Archive */
+.arch-list{display:flex;flex-direction:column;gap:8px}
+.arch-item{background:var(--su);border:1px solid var(--bo);border-radius:10px;overflow:hidden}
+.arch-hd{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:12px}
+.arch-dt{font-size:13px;font-weight:700}
+.arch-mt{font-size:11px;color:var(--mu);background:var(--su2);padding:2px 8px;border-radius:10px;margin-top:3px}
+.arch-ar{font-size:11px;color:var(--mu);transition:transform .2s;flex-shrink:0}
+.arch-item.open .arch-ar{transform:rotate(180deg)}
+.arch-bd{display:none;padding:0 18px 14px;font-size:13px;color:var(--mu);font-style:italic;line-height:1.65}
+.arch-item.open .arch-bd{display:block}
+/* Footer */
+.ftr{text-align:center;padding:48px 24px 0;border-top:1px solid var(--bo);margin-top:52px}
+.ftr-nm{font-size:20px;font-weight:900;color:var(--gold);letter-spacing:-.02em;margin-bottom:8px}
+.ftr-mt{font-size:12px;color:var(--mu);line-height:1.9}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-in">
+    <div><div class="pub-nm">Lead AI Be</div><div class="pub-sb">AI in Education · Weekly Digest</div></div>
+    <div class="hdr-rt">
+      <span class="pub-dt">Friday, June 26, 2026</span>
+      <span class="bdg bl">● Live search</span>
+    </div>
+  </div>
+</header>
+<main class="main">
+<div class="intro">The week of June 20–26, 2026 finds higher education at a genuine inflection point: student AI adoption is near-universal, institutions are racing to redesign curricula and governance before regulation catches up, and the honest data on ROI and detection accuracy is forcing faculty developers to move from policy theater to pedagogical redesign.</div>
+<section class="cat-sec">
+<div class="cat-hdr" style="border-left:4px solid #CFB991">
+  <span class="cat-ico">⚙️</span>
+  <div><div class="cat-nm" style="color:#CFB991">AI Tools &amp; Updates</div><div class="cat-sig">Institutional AI stacks are maturing from general-purpose chatbots toward purpose-built, discipline-specific tools — and the ROI question is finally being asked out loud.</div></div>
+</div>
+<div class="grid">
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="EDUCAUSE 2026 Workforce Report: How Teams Are Adapting to AI">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #CFB991">
+      <div class="cs" style="color:#CFB991">EDUCAUSE</div>
+      <div class="ch">EDUCAUSE 2026 Workforce Report: How Teams Are Adapting to AI</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #CFB991">
+      <div class="cs" style="color:#CFB991">EDUCAUSE</div>
+      <div class="ch sm">EDUCAUSE 2026 Workforce Report: How Teams Are Adapting to AI</div>
+      <div class="det">Published June 8, EDUCAUSE's annual workforce study finds that 81% of HE technology and data professionals feel enthusiasm or cautious enthusiasm toward AI, while institutions are overwhelmingly upskilling existing staff rather than hiring new AI roles — 80% encourage self-directed development and 71% offer in-house certificates. The report was produced in partnership with AIR, NACUBO, and CUPA-HR.</div>
+      <a href="https://www.educause.edu/content/2026/2026-educause-workforce-report-how-teams-are-adapting-to-ai-external-pressures-and-strategic-change" target="_blank" rel="noopener" class="rl" style="color:#CFB991" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="Half of Campus Tech Leaders Question AI's ROI">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #CFB991">
+      <div class="cs" style="color:#CFB991">Inside Higher Ed</div>
+      <div class="ch">Half of Campus Tech Leaders Question AI's ROI</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #CFB991">
+      <div class="cs" style="color:#CFB991">Inside Higher Ed</div>
+      <div class="ch sm">Half of Campus Tech Leaders Question AI's ROI</div>
+      <div class="det">Inside Higher Ed's 2026 Survey of 130 Campus CTOs (Hanover Research) finds that although universities are spending heavily on AI, only 29% say investments have met or exceeded ROI expectations. A key driver of over-adoption: 41% of CTOs rank &quot;falling behind peers&quot; among their top fears for 2030, suggesting competitive anxiety is outpacing evidence-based procurement.</div>
+      <a href="https://www.insidehighered.com/news/tech-innovation/artificial-intelligence/2026/05/12/half-campus-tech-leaders-question-ais-roi" target="_blank" rel="noopener" class="rl" style="color:#CFB991" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="EDUCAUSE Review: A Framework for Transparent GenAI Use in Higher Education">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #CFB991">
+      <div class="cs" style="color:#CFB991">EDUCAUSE Review</div>
+      <div class="ch">EDUCAUSE Review: A Framework for Transparent GenAI Use in Higher Education</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #CFB991">
+      <div class="cs" style="color:#CFB991">EDUCAUSE Review</div>
+      <div class="ch sm">EDUCAUSE Review: A Framework for Transparent GenAI Use in Higher Education</div>
+      <div class="det">This Tier 1 practitioner piece from Northeastern's Lance Eaton and Constructor University's Carol Damm provides tiered disclosure language for instructional designers and faculty — from minimal GenAI polish to comprehensive AI-assisted course builds — and argues that transparency about AI use is both an ethical safeguard and a form of modeling academic integrity.</div>
+      <a href="https://er.educause.edu/articles/2026/3/from-prompt-to-practice-a-framework-for-transparent-genai-use-in-higher-education" target="_blank" rel="noopener" class="rl" style="color:#CFB991" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div></div>
+<div class="why" style="border-left:2px solid #CFB991">💡 <em>Why it matters for faculty developers:</em> Faculty developers need concrete disclosure scaffolding now: ROI skepticism from CTOs and workforce upskilling gaps signal that ID teams will be called on to both justify AI investments and build the training infrastructure institutions are clearly underproviding.</div>
+</section><div class="div"></div><section class="cat-sec">
+<div class="cat-hdr" style="border-left:4px solid #a78bfa">
+  <span class="cat-ico">🏛️</span>
+  <div><div class="cat-nm" style="color:#a78bfa">Policy &amp; Institutions</div><div class="cat-sig">Curriculum redesign and regulatory pressure are converging: institutions that wait for policy certainty before acting on AI integration risk being overtaken by peers who are already redesigning degrees from the ground up.</div></div>
+</div>
+<div class="grid">
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="University of Surrey Redesigns All Degrees to Embed Discipline-Specific AI from September 2026">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #a78bfa">
+      <div class="cs" style="color:#a78bfa">Times Higher Education</div>
+      <div class="ch">University of Surrey Redesigns All Degrees to Embed Discipline-Specific AI from September 2026</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #a78bfa">
+      <div class="cs" style="color:#a78bfa">Times Higher Education</div>
+      <div class="ch sm">University of Surrey Redesigns All Degrees to Embed Discipline-Specific AI from September 2026</div>
+      <div class="det">In what Times Higher Education calls &quot;a first for the sector,&quot; Surrey has undertaken a systematic redesign of every degree programme — not a standalone AI module, but discipline-embedded teaching in which students learn to critically interrogate AI outputs within their field. Assessment is simultaneously shifting from product to process, requiring draft portfolios, revision histories, and reflective logs.</div>
+      <a href="https://www.timeshighereducation.com/news/surrey-redesigns-all-degrees-embed-discipline-specific-ai" target="_blank" rel="noopener" class="rl" style="color:#a78bfa" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="South Africa Launches National AI Integrity Charter, Signed by 23 Public Universities">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #a78bfa">
+      <div class="cs" style="color:#a78bfa">Windows News / صوت الإمارات (sourced via Windows Forum)</div>
+      <div class="ch">South Africa Launches National AI Integrity Charter, Signed by 23 Public Universities</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #a78bfa">
+      <div class="cs" style="color:#a78bfa">Windows News / صوت الإمارات (sourced via Windows Forum)</div>
+      <div class="ch sm">South Africa Launches National AI Integrity Charter, Signed by 23 Public Universities</div>
+      <div class="det">By March 2026, 23 South African public institutions had signed the Department of Higher Education and Training's &quot;AI Integrity Charter,&quot; making it one of the most coordinated national responses to AI misconduct outside Europe. The move underscores that integrity governance is no longer a solo institutional decision in many jurisdictions.</div>
+      <a href="https://windowsnews.ai/article/ai-goes-mainstream-in-2026-classrooms-forcing-a-reckoning-on-assessment-and-integrity.428624" target="_blank" rel="noopener" class="rl" style="color:#a78bfa" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="Wiley/Higher Education Quarterly: Global AI Regulation and Its Impact on Universities">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #a78bfa">
+      <div class="cs" style="color:#a78bfa">Higher Education Quarterly / Wiley</div>
+      <div class="ch">Wiley/Higher Education Quarterly: Global AI Regulation and Its Impact on Universities</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #a78bfa">
+      <div class="cs" style="color:#a78bfa">Higher Education Quarterly / Wiley</div>
+      <div class="ch sm">Wiley/Higher Education Quarterly: Global AI Regulation and Its Impact on Universities</div>
+      <div class="det">This peer-reviewed letter in Higher Education Quarterly (Uslu &amp; Bozkurt, Anadolu University, 2026) maps the EU AI Act, US, UK, Australian, Chinese, and Canadian regulatory frameworks, identifying converging principles — risk-based classification, accountability, intellectual property — that HE leaders must navigate simultaneously, with EU-classified &quot;high-risk&quot; systems including AI admissions and analytics tools.</div>
+      <a href="https://onlinelibrary.wiley.com/doi/10.1111/hequ.70108" target="_blank" rel="noopener" class="rl" style="color:#a78bfa" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div></div>
+<div class="why" style="border-left:2px solid #a78bfa">💡 <em>Why it matters for faculty developers:</em> Instructional designers at globally networked or EU-adjacent institutions must now factor regulatory classification — not just pedagogical suitability — into every AI tool adoption decision, and Surrey's degree-wide redesign offers a concrete institutional model to benchmark against.</div>
+</section><div class="div"></div><section class="cat-sec">
+<div class="cat-hdr" style="border-left:4px solid #22d3ee">
+  <span class="cat-ico">📚</span>
+  <div><div class="cat-nm" style="color:#22d3ee">Research &amp; Pedagogy</div><div class="cat-sig">The OECD's landmark synthesis and a growing body of experimental evidence align on a single finding: GenAI improves performance but not necessarily learning — the difference lies entirely in pedagogical design intent.</div></div>
+</div>
+<div class="grid">
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="OECD Digital Education Outlook 2026: Effective Uses of Generative AI in Education">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #22d3ee">
+      <div class="cs" style="color:#22d3ee">OECD Education</div>
+      <div class="ch">OECD Digital Education Outlook 2026: Effective Uses of Generative AI in Education</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #22d3ee">
+      <div class="cs" style="color:#22d3ee">OECD Education</div>
+      <div class="ch sm">OECD Digital Education Outlook 2026: Effective Uses of Generative AI in Education</div>
+      <div class="det">This flagship OECD report synthesises international evidence and finds that general-purpose GenAI tools can boost task performance while producing no sustained learning gains; the advantage &quot;disappears — and sometimes reverses — in exams when access is removed.&quot; Education-specific GenAI tools designed with pedagogical intent show sustained improvement. The report also finds that co-designing tools with teachers amplifies outcomes beyond what either teachers or AI achieve alone.</div>
+      <a href="https://www.oecd.org/en/publications/oecd-digital-education-outlook-2026_062a7394-en.html" target="_blank" rel="noopener" class="rl" style="color:#22d3ee" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="Stanford HAI 2026 AI Index — Education Chapter: 4 in 5 University Students Use GenAI, Formal Education Still Catching Up">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #22d3ee">
+      <div class="cs" style="color:#22d3ee">Stanford HAI</div>
+      <div class="ch">Stanford HAI 2026 AI Index — Education Chapter: 4 in 5 University Students Use GenAI, Formal Education Still Catching Up</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #22d3ee">
+      <div class="cs" style="color:#22d3ee">Stanford HAI</div>
+      <div class="ch sm">Stanford HAI 2026 AI Index — Education Chapter: 4 in 5 University Students Use GenAI, Formal Education Still Catching Up</div>
+      <div class="det">Stanford HAI's 2026 AI Index confirms that 80% of university students now use generative AI for schoolwork, yet only 48% of institutions have formal AI policies, and just 6% of teachers report those policies are clear. AI literacy is growing faster than engineering-oriented AI skills globally, with notable exceptions in the UAE, Chile, and South Africa.</div>
+      <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report/education" target="_blank" rel="noopener" class="rl" style="color:#22d3ee" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="University of Sussex June 2026 AI in Education Spotlight: Surrey Embeds AI, UK Government London Tech Week Announcements, Gen Z Concerns">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #22d3ee">
+      <div class="cs" style="color:#22d3ee">University of Sussex Learning Matters</div>
+      <div class="ch">University of Sussex June 2026 AI in Education Spotlight: Surrey Embeds AI, UK Government London Tech Week Announcements, Gen Z Concerns</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #22d3ee">
+      <div class="cs" style="color:#22d3ee">University of Sussex Learning Matters</div>
+      <div class="ch sm">University of Sussex June 2026 AI in Education Spotlight: Surrey Embeds AI, UK Government London Tech Week Announcements, Gen Z Concerns</div>
+      <div class="det">Published June 22 by the University of Sussex Educational Enhancement team, this practitioner bulletin synthesises June 2026's key sector developments: Surrey's degree-wide AI redesign, JISC's HE AI Community Meetup findings, Gen Z's ambivalence about AI replacing human skills (per Gallup), and UK Government AI infrastructure pledges from London Tech Week. Concrete faculty development recommendations include open-access AI guidance pages and a new-colleague AI onboarding activity.</div>
+      <a href="https://blogs.sussex.ac.uk/learning-matters/2026/06/22/spotlight-on-ai-in-education-june-2026/" target="_blank" rel="noopener" class="rl" style="color:#22d3ee" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div></div>
+<div class="why" style="border-left:2px solid #22d3ee">💡 <em>Why it matters for faculty developers:</em> The OECD finding that pedagogical intent — not mere access — determines whether AI produces learning is the most evidence-based argument faculty developers currently have for insisting on curriculum co-design involvement before any institutional AI tool deployment.</div>
+</section><div class="div"></div><section class="cat-sec">
+<div class="cat-hdr" style="border-left:4px solid #fb923c">
+  <span class="cat-ico">🛡️</span>
+  <div><div class="cat-nm" style="color:#fb923c">Assessment &amp; Integrity</div><div class="cat-sig">Detection-first approaches to academic integrity are failing on their own terms; the field is converging on assessment redesign and governance architecture as the durable alternatives.</div></div>
+</div>
+<div class="grid">
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="EDUCAUSE 2026 Impact of AI on Learning Assessment Report">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #fb923c">
+      <div class="cs" style="color:#fb923c">EDUCAUSE</div>
+      <div class="ch">EDUCAUSE 2026 Impact of AI on Learning Assessment Report</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #fb923c">
+      <div class="cs" style="color:#fb923c">EDUCAUSE</div>
+      <div class="ch sm">EDUCAUSE 2026 Impact of AI on Learning Assessment Report</div>
+      <div class="det">Based on a March 2026 survey of 438 faculty and staff actively designing assessments, this EDUCAUSE report is explicitly addressed to instructional designers and faculty developers. It finds &quot;growing momentum around AI in assessment alongside real uncertainty,&quot; with faculty grappling with how to balance AI-assisted work, evolving academic integrity norms, and institutional readiness gaps.</div>
+      <a href="https://library.educause.edu/resources/2026/6/2026-educause-the-impact-of-ai-on-learning-assessment-report" target="_blank" rel="noopener" class="rl" style="color:#fb923c" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="IntelligentHQ (June 19, 2026): AI Detection Tools and University Digital Transformation — A Governance Challenge, Not a Software Problem">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #fb923c">
+      <div class="cs" style="color:#fb923c">IntelligentHQ</div>
+      <div class="ch">IntelligentHQ (June 19, 2026): AI Detection Tools and University Digital Transformation — A Governance Challenge, Not a Software Problem</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #fb923c">
+      <div class="cs" style="color:#fb923c">IntelligentHQ</div>
+      <div class="ch sm">IntelligentHQ (June 19, 2026): AI Detection Tools and University Digital Transformation — A Governance Challenge, Not a Software Problem</div>
+      <div class="det">Published one week ago, this analysis argues that AI detection tools now sit inside a much larger university digital transformation strategy, affecting policy, procurement, data protection, staff training, and student trust. The piece urges leaders to avoid two extremes — ignoring AI or over-relying on surveillance — and frames academic integrity in the AI era as a governance and leadership challenge rather than a software solution.</div>
+      <a href="https://www.intelligenthq.com/the-role-of-ai-detection-tools-in-maintaining-academic-integrity-in-universities/" target="_blank" rel="noopener" class="rl" style="color:#fb923c" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="AI Goes Mainstream in 2026 Classrooms, Forcing a Reckoning on Assessment and Integrity (Windows News / صوت الإمارات, June 20, 2026)">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #fb923c">
+      <div class="cs" style="color:#fb923c">Windows Forum / صوت الإمارات</div>
+      <div class="ch">AI Goes Mainstream in 2026 Classrooms, Forcing a Reckoning on Assessment and Integrity (Windows News / صوت الإمارات, June 20, 2026)</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #fb923c">
+      <div class="cs" style="color:#fb923c">Windows Forum / صوت الإمارات</div>
+      <div class="ch sm">AI Goes Mainstream in 2026 Classrooms, Forcing a Reckoning on Assessment and Integrity (Windows News / صوت الإمارات, June 20, 2026)</div>
+      <div class="det">This June 20 analysis draws on UK, Australian, Canadian, and South African institutional data to show that 80%+ of students now use generative AI, only 18% of faculty across 12 universities feel they can distinguish AI-aided learning from cheating, and AI detection scores are &quot;too fragile to serve as standalone proof of academic dishonesty.&quot; The piece argues that universities succeeding in this moment will rebuild integrity around demonstrable learning rather than document purity.</div>
+      <a href="https://windowsforum.com/threads/ai-in-education-by-2026-assessment-panic-cheating-doubts-and-better-integrity-rules.428624/" target="_blank" rel="noopener" class="rl" style="color:#fb923c" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div></div>
+<div class="why" style="border-left:2px solid #fb923c">💡 <em>Why it matters for faculty developers:</em> The EDUCAUSE assessment report combined with the June 19–20 governance analyses give ID teams a data-backed case for replacing reactive detection workflows with proactive assessment redesign — process portfolios, oral components, and context-specific tasks that AI cannot easily replicate.</div>
+</section><div class="div"></div><section class="cat-sec">
+<div class="cat-hdr" style="border-left:4px solid #4ade80">
+  <span class="cat-ico">💡</span>
+  <div><div class="cat-nm" style="color:#4ade80">Big Ideas</div><div class="cat-sig">The week's opinion and analysis converge on a single uncomfortable thesis: higher education's traditional mission — transmitting expertise — may be its greatest liability in an AI era, not its strength.</div></div>
+</div>
+<div class="grid">
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="Inside Higher Ed (June 18, 2026): &quot;In the Age of AI, Higher Ed's Edge Is Being Human&quot;">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #4ade80">
+      <div class="cs" style="color:#4ade80">Inside Higher Ed</div>
+      <div class="ch">Inside Higher Ed (June 18, 2026): &quot;In the Age of AI, Higher Ed's Edge Is Being Human&quot;</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #4ade80">
+      <div class="cs" style="color:#4ade80">Inside Higher Ed</div>
+      <div class="ch sm">Inside Higher Ed (June 18, 2026): &quot;In the Age of AI, Higher Ed's Edge Is Being Human&quot;</div>
+      <div class="det">Published last week by IHE editor Sara Custer following an event with the University at Buffalo, this column reports that leaders from industry, policy, and higher education found grounds for optimism precisely by leaning into human imperfection — purposefulness, relationality, ethical reasoning — as the differentiator AI cannot replicate. &quot;We're entering a golden age of humanists,&quot; one panelist argued. The piece directly challenges faculty to articulate what universities offer beyond information production.</div>
+      <a href="https://www.insidehighered.com/opinion/columns/editors-note/2026/06/18/age-ai-higher-eds-edge-being-human" target="_blank" rel="noopener" class="rl" style="color:#4ade80" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="EDUCAUSE Review: &quot;The University, the Chatbot, and a Call for a New Mission for Higher Education&quot;">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #4ade80">
+      <div class="cs" style="color:#4ade80">EDUCAUSE Review</div>
+      <div class="ch">EDUCAUSE Review: &quot;The University, the Chatbot, and a Call for a New Mission for Higher Education&quot;</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #4ade80">
+      <div class="cs" style="color:#4ade80">EDUCAUSE Review</div>
+      <div class="ch sm">EDUCAUSE Review: &quot;The University, the Chatbot, and a Call for a New Mission for Higher Education&quot;</div>
+      <div class="det">Authored by Paul LeBlanc (Harvard Ed), George Siemens (SNHU), and colleagues, this essay argues that transmitting knowledge is now higher education's &quot;greatest vulnerability if it remains the central mission.&quot; The piece calls for reorienting HE around students as &quot;stewards of intelligent systems&quot; — integrating knowledge across domains, aligning AI with human values, and developing the emotional intelligence and ethical judgment that employers already report are missing in graduates.</div>
+      <a href="https://er.educause.edu/articles/2026/1/the-university-the-chatbot-and-a-call-for-a-new-mission-for-higher-education" target="_blank" rel="noopener" class="rl" style="color:#4ade80" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div>
+<div class="fc" onclick="this.classList.toggle('flipped')" tabindex="0" role="button" aria-label="HEPI Student Generative AI Survey 2026: 94% of UK Undergraduates Use AI for Assessed Work, but Fewer Than Half Feel Supported to Develop the Skills">
+  <div class="fi">
+    <div class="ff" style="border-top:3px solid #4ade80">
+      <div class="cs" style="color:#4ade80">HEPI (Higher Education Policy Institute)</div>
+      <div class="ch">HEPI Student Generative AI Survey 2026: 94% of UK Undergraduates Use AI for Assessed Work, but Fewer Than Half Feel Supported to Develop the Skills</div>
+      <div class="hint">Tap to read more ↗</div>
+    </div>
+    <div class="fb" style="border-top:3px solid #4ade80">
+      <div class="cs" style="color:#4ade80">HEPI (Higher Education Policy Institute)</div>
+      <div class="ch sm">HEPI Student Generative AI Survey 2026: 94% of UK Undergraduates Use AI for Assessed Work, but Fewer Than Half Feel Supported to Develop the Skills</div>
+      <div class="det">HEPI Report 199 (sponsored by Kortext, based on 1,054 full-time UK undergraduates) finds 94% use GenAI for assessed work — up from 3% in 2024 — and 49% say AI has improved their experience. Yet fewer than half feel their teaching staff are helping them develop AI skills, a 20-percentage-point gap that HEPI's Policy Manager calls &quot;a crucial role&quot; universities must urgently fill.</div>
+      <a href="https://www.hepi.ac.uk/reports/student-generative-ai-survey-2026/" target="_blank" rel="noopener" class="rl" style="color:#4ade80" onclick="event.stopPropagation()">Read original →</a>
+    </div>
+  </div>
+</div></div>
+<div class="why" style="border-left:2px solid #4ade80">💡 <em>Why it matters for faculty developers:</em> The LeBlanc/Siemens mission-reframing piece and the HEPI skills-gap data together give faculty developers a strategic argument — grounded in both institutional theory and student voice — for why AI literacy must be embedded across the curriculum, not treated as an add-on elective.</div>
+</section>
+<div class="div"></div>
+<section class="ep">
+<div class="ep-lbl">★ Editor's Pick</div>
+<div class="ep-hl">EDUCAUSE 2026 Impact of AI on Learning Assessment Report</div>
+<div class="ep-dt">This is the single most actionable item this week for faculty developers and instructional designers. Produced by EDUCAUSE in June 2026 from a survey of 438 practitioners actively doing assessment work, it speaks directly to your audience in your language — covering faculty perspectives, institutional readiness, evolving AI use expectations, and the shifting role of assessment design. Use it as a mirror: compare your institution's current assessment inventory against the report's findings to identify where policies are silent, where faculty need development, and where assessment structures still reward output over process. Recommended action: Download the report, convene a faculty development working group around its findings this summer, and use it to frame a fall workshop series on assessment redesign before the next academic year begins.</div>
+<div class="ep-ft">
+  <span class="ep-src">EDUCAUSE</span>
+  <a href="https://library.educause.edu/resources/2026/6/2026-educause-the-impact-of-ai-on-learning-assessment-report" target="_blank" rel="noopener" class="ep-lk">Read original →</a>
+</div>
+</section>
+
+
+</main>
+<footer class="ftr">
+  <div class="ftr-nm">Lead AI Be</div>
+  <div class="ftr-mt">AI in Education Weekly Digest · Friday, June 26, 2026<br/>Curated by a human editor · AI-assisted research · Sources verified</div>
+</footer>
+<script>
+document.querySelectorAll('.fc').forEach(c=>{
+  c.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();c.classList.toggle('flipped');} });
+});
+document.querySelectorAll('.arch-hd').forEach(h=>{
+  h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));
+});
+</script>
+</body>
+</html>
