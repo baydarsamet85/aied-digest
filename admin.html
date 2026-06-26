@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Ed Digest — Editorial Tool</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #253347;
+    --border: #334155;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #4f46e5;
+    --accent-soft: rgba(79,70,229,0.15);
+    --green: #22c55e;
+    --green-soft: rgba(34,197,94,0.12);
+    --red: #ef4444;
+    --red-soft: rgba(239,68,68,0.12);
+    --amber: #f59e0b;
+    --amber-soft: rgba(245,158,11,0.12);
+
+    --cat-tools:   #60a5fa;
+    --cat-policy:  #a78bfa;
+    --cat-research:#22d3ee;
+    --cat-assess:  #fbbf24;
+    --cat-ideas:   #34d399;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding-bottom: 64px;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-title { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+  .header-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  /* ── Buttons ── */
+  .btn {
+    padding: 7px 16px; border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: opacity 0.15s;
+  }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-primary  { background: var(--accent); color: #fff; }
+  .btn-ghost    { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .btn-publish  { background: var(--green); color: #0f2318; }
+  .btn-sm       { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+  .btn-keep     { background: var(--green-soft);  color: var(--green);  border: 1px solid rgba(34,197,94,0.3); }
+  .btn-edit     { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(245,158,11,0.3); }
+  .btn-remove   { background: var(--red-soft);    color: var(--red);    border: 1px solid rgba(239,68,68,0.3); }
+  .btn-keep.active   { background: var(--green);  color: #0f2318; }
+  .btn-remove.active { background: var(--red);    color: #fff; }
+
+  /* ── Layout ── */
+  .main { max-width: 860px; margin: 0 auto; padding: 28px 16px 0; }
+
+  /* ── Token gate ── */
+  .token-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .token-bar label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .token-bar input {
+    flex: 1; min-width: 200px;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 12px; font-size: 13px; font-family: monospace;
+  }
+  .token-bar input:focus { outline: 2px solid var(--accent); }
+  .token-status { font-size: 11px; font-weight: 600; }
+  .token-status.ok  { color: var(--green); }
+  .token-status.bad { color: var(--red); }
+
+  /* ── Intro card ── */
+  .intro-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #cbd5e1;
+    font-style: italic;
+  }
+
+  /* ── Category header ── */
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 12px;
+  }
+  .cat-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .cat-name  { font-size: 12px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+  .cat-signal { font-size: 13px; color: var(--muted); }
+  .cat-why {
+    font-size: 12px; color: var(--muted); font-style: italic;
+    padding: 8px 14px;
+    background: var(--surface);
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  /* ── News card ── */
+  .news-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .news-card.kept    { border-color: rgba(34,197,94,0.5); }
+  .news-card.removed { opacity: 0.35; border-color: rgba(239,68,68,0.4); }
+  .news-card.editing { border-color: var(--amber); }
+
+  .card-top {
+    padding: 14px 16px 10px;
+  }
+  .card-source {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .card-headline {
+    font-size: 14px; font-weight: 700; line-height: 1.4;
+    margin-bottom: 6px; color: var(--text);
+  }
+  .card-detail {
+    font-size: 13px; line-height: 1.65; color: #94a3b8;
+  }
+
+  .card-actions {
+    border-top: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-status {
+    margin-left: auto;
+    font-size: 11px; font-weight: 600; color: var(--muted);
+  }
+
+  /* ── Edit form ── */
+  .edit-form {
+    padding: 14px 16px;
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .edit-form label { font-size: 11px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 4px; }
+  .edit-form input,
+  .edit-form textarea {
+    width: 100%;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; font-family: inherit;
+    line-height: 1.5;
+  }
+  .edit-form textarea { resize: vertical; min-height: 80px; }
+  .edit-form input:focus,
+  .edit-form textarea:focus { outline: 2px solid var(--accent); }
+  .edit-save { align-self: flex-start; }
+
+  /* ── Editor's Pick ── */
+  .editors-pick {
+    background: #1e1b4b;
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+  .editors-pick-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    color: #a5b4fc; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .editors-pick-headline {
+    font-size: 15px; font-weight: 800; color: #e0e7ff; margin-bottom: 8px;
+  }
+  .editors-pick-detail { font-size: 13.5px; line-height: 1.65; color: #c7d2fe; }
+  .editors-pick-source {
+    display: inline-block; margin-top: 10px;
+    font-size: 11px; font-weight: 600; color: #a5b4fc;
+    background: rgba(99,102,241,0.18); border-radius: 4px; padding: 2px 8px;
+  }
+
+  /* ── Publish panel ── */
+  .publish-panel {
+    margin-top: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .publish-panel h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .publish-panel p  { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+  .publish-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .publish-input {
+    flex: 1; min-width: 240px;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; font-family: monospace;
+  }
+  .publish-input:focus { outline: 2px solid var(--accent); }
+  .publish-log {
+    margin-top: 14px; padding: 10px 14px;
+    background: var(--bg); border-radius: 8px;
+    font-size: 12px; font-family: monospace;
+    color: var(--muted); white-space: pre-wrap; line-height: 1.7;
+  }
+  .log-ok  { color: var(--green); }
+  .log-err { color: var(--red); }
+
+  /* ── Loading / empty states ── */
+  .state-center {
+    text-align: center; padding: 64px 0; color: var(--muted);
+  }
+  .state-center .icon { font-size: 40px; margin-bottom: 16px; }
+  .state-center h2 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .state-center p  { font-size: 13px; }
+
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-msg { font-size: 14px; color: var(--muted); margin-top: 16px; }
+
+  /* ── Summary bar ── */
+  .summary-bar {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 24px;
+    font-size: 12px;
+  }
+  .summary-stat strong { display: block; font-size: 20px; font-weight: 800; }
+  .summary-stat.kept   strong { color: var(--green); }
+  .summary-stat.removed strong { color: var(--red); }
+  .summary-stat.pending strong { color: var(--amber); }
+
+  /* ── Error ── */
+  .error-box {
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+  }
+  .error-box h3 { color: var(--red); font-size: 13px; margin-bottom: 6px; }
+  .error-box pre { font-size: 12px; color: #fca5a5; white-space: pre-wrap; margin-bottom: 12px; }
+
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 20px; letter-spacing: 0.05em;
+  }
+  .badge-live { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-kb   { background: rgba(96,165,250,0.15); color: var(--cat-tools); }
+</style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────────────────────── -->
+<header class="header">
+  <div>
+    <div class="header-title">📰 AI Ed Digest — Editorial Tool</div>
+    <div class="header-sub">Generate · Review · Approve · Publish</div>
+  </div>
+  <div class="header-actions">
+    <select id="lengthPref" style="font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;">
+      <option value="brief">Brief</option>
+      <option value="standard" selected>Standard</option>
+      <option value="detailed">Detailed</option>
+    </select>
+    <button class="btn btn-ghost" id="btnClear" disabled>✕ Clear</button>
+    <button class="btn btn-primary" id="btnGenerate">Generate Digest</button>
+  </div>
+</header>
+
+<!-- ── Main ────────────────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Anthropic API key bar -->
+  <div class="token-bar">
+    <label for="apiKey">🔑 Anthropic API Key</label>
+    <input type="password" id="apiKey" placeholder="sk-ant-…" autocomplete="off" spellcheck="false" />
+    <span class="token-status" id="keyStatus"></span>
+  </div>
+
+  <!-- Dynamic content -->
+  <div id="content">
+    <div class="state-center">
+      <div class="icon">📋</div>
+      <h2>Editorial tool ready</h2>
+      <p>Enter your Anthropic API key above, then click <strong>Generate Digest</strong>.</p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// CONFIG & CONSTANTS
+// ══════════════════════════════════════════════════════════════════════════════
+
+const CAT_COLORS = {
+  "AI Tools & Updates":     "var(--cat-tools)",
+  "Policy & Institutions":  "var(--cat-policy)",
+  "Research & Pedagogy":    "var(--cat-research)",
+  "Assessment & Integrity": "var(--cat-assess)",
+  "Big Ideas":              "var(--cat-ideas)",
+};
+const DEFAULT_COLOR = "var(--muted)";
+
+const LOAD_MSGS = [
+  "Scanning higher-ed news sources…",
+  "Checking policy updates and research…",
+  "Synthesising this week's signal from noise…",
+  "Curating what matters for faculty developers…",
+  "Almost there — formatting your digest…",
+];
+
+const SOURCES = {
+  tier1: ["EDUCAUSE","Inside Higher Ed","The Chronicle of Higher Education","EdSurge","MIT Technology Review","Times Higher Education","Stanford HAI","The Hechinger Report","Educause Review"],
+  tier2: ["Brookings Institution","RAND Education","OECD Education","New America","Lumina Foundation","AI Now Institute (NYU)","Data & Society","UNESCO Education","Partnership on AI","AIR (American Institutes for Research)","Aspen Institute","Center for Democracy & Technology","Future of Life Institute","Bill & Melinda Gates Foundation","HEPI","Journal of AI in Education (JAIED)","Computers & Education","British Journal of Educational Technology","Journal of Learning Analytics","npj Science of Learning","Internet and Higher Education","Turnitin Research Blog","ETS Research Institute","IMS Global / 1EdTech","CHEA","European Commission — Education & Training","World Economic Forum Education","Commonwealth of Learning"],
+  tier3: ["One Useful Thing (Ethan Mollick)","AI Snake Oil (Narayanan & Kapoor)","Import AI (Jack Clark)","The Gradient","Google DeepMind Blog","OpenAI Blog","Anthropic Research Blog","Meta AI Blog","Hugging Face Blog","arXiv (cs.AI, cs.CY, cs.HC)","Wired","Ars Technica","VentureBeat AI","IEEE Spectrum","The Verge","Hard Fork (NYT)","Nature Machine Intelligence","ACM Digital Library","Faculty Focus","Teaching in Higher Ed","HASTAC","Digital Promise","Campus Technology","eCampus News","University Affairs","Diverse: Issues in Higher Education","Community College Daily","Tomorrow's Professor (Stanford)","Harvard Education Press Blog","AJET (Australasian Journal of Educational Technology)","ETR&D (Educational Technology Research & Development)","Asian Development Bank Education"],
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════════════
+
+let digest    = null;   // parsed digest object
+let cardState = {};     // { catIdx_itemIdx: { status: 'keep'|'remove'|'pending', headline, detail, source } }
+let isLive    = false;
+let pubDate   = "";
+
+// ══════════════════════════════════════════════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════════════════════════════════════════════
+
+const apiKeyInput  = document.getElementById('apiKey');
+const keyStatus    = document.getElementById('keyStatus');
+
+// Restore saved key
+const savedKey = localStorage.getItem('aied-apikey');
+if (savedKey) { apiKeyInput.value = savedKey; keyStatus.textContent = '✓ Saved'; keyStatus.className = 'token-status ok'; }
+
+apiKeyInput.addEventListener('input', () => {
+  const v = apiKeyInput.value.trim();
+  if (v.startsWith('sk-ant-') && v.length > 20) {
+    localStorage.setItem('aied-apikey', v);
+    keyStatus.textContent = '✓ Saved'; keyStatus.className = 'token-status ok';
+  } else {
+    keyStatus.textContent = v ? 'Invalid format' : ''; keyStatus.className = 'token-status bad';
+  }
+});
+
+function getKey() { return apiKeyInput.value.trim(); }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SYSTEM + USER PROMPT
+// ══════════════════════════════════════════════════════════════════════════════
+
+function buildSystem(lengthPref) {
+  const t1 = SOURCES.tier1.join(', ');
+  const t2 = SOURCES.tier2.join(', ');
+  const t3 = SOURCES.tier3.join(', ');
+  const lengthLine = lengthPref === 'brief'
+    ? '\n## USER PREFERENCES\nLENGTH: Keep each item to 2 sentences max. Prioritise brevity.\n'
+    : lengthPref === 'detailed'
+    ? '\n## USER PREFERENCES\nLENGTH: Provide 3–4 sentences per item with richer context.\n'
+    : '';
+  return `You are the editor of the AI in Education Weekly Digest — a curated, authoritative briefing for faculty developers and instructional designers in higher education. Your audience is mid-to-senior professionals who need reliable signal, not hype.
+
+## SOURCE LIBRARY
+Tier 1 — Always check: ${t1}
+Tier 2 — Check every digest: ${t2}
+Tier 3 — Pull when relevant: ${t3}
+
+## NEWS SELECTION CRITERIA
+1. Recency — published within the past 7 days.
+2. Source credibility — named source in the library above, or primary institutional source.
+3. Audience relevance — directly relevant to faculty developers, instructional designers, or HE administrators.
+4. Significance — institutional decisions, peer-reviewed findings, regulatory developments. Deprioritise speculation and vendor PR.
+5. Diversity — at least one non-US source and one peer-reviewed item per digest.
+
+## DIGEST STRUCTURE
+Produce exactly five categories in this order:
+1. AI Tools & Updates
+2. Policy & Institutions
+3. Research & Pedagogy
+4. Assessment & Integrity
+5. Big Ideas
+
+Each category: key takeaway signal sentence, 2–4 items (headline + 2–3 sentence detail + source), why-it-matters closing line.
+End with one Editor's Pick — the single most actionable item, 3–4 sentences.
+${lengthLine}
+## OUTPUT FORMAT
+Respond ONLY in pipe-delimited format. No markdown, no preamble. Use ||| as separator. Each record on its own line.
+
+INTRO|||[1–2 sentence theme framing]
+CATEGORY|||[Name]|||[Key takeaway signal]
+ITEM|||[Headline]|||[Detail + source attribution]|||[Source Name]
+WHYMATTERS|||[1 sentence for faculty developers]
+EDITOR|||[Headline]|||[3–4 sentence explanation + action]|||[Source Name]`;
+}
+
+function buildUser(today, live) {
+  return live
+    ? `Today is ${today}. Search the web for AI in higher education news from the past 7 days. Return ONLY the pipe-delimited format — no other text.`
+    : `Today is ${today}. Using your training knowledge (web search unavailable), produce the best digest you can. Note in the INTRO that this uses knowledge-cutoff data. Return ONLY the pipe-delimited format.`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// API CALL
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function callAPI(system, userMsg, useSearch, apiKey) {
+  const body = {
+    model: "claude-sonnet-4-6",
+    max_tokens: 1000,
+    system,
+    messages: [{ role: "user", content: userMsg }],
+  };
+  if (useSearch) body.tools = [{ type: "web_search_20250305", name: "web_search" }];
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-calls": "true" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `API error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.content.filter(b => b.type === "text").map(b => b.text).join("\n");
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PARSER
+// ══════════════════════════════════════════════════════════════════════════════
+
+function parseDigest(raw) {
+  const lines  = raw.split("\n").map(l => l.trim()).filter(Boolean);
+  const result = { intro: "", categories: [], editor: null };
+  let current  = null;
+  for (const line of lines) {
+    const p = line.split("|||");
+    const t = p[0]?.toUpperCase();
+    if (t === "INTRO") {
+      result.intro = p[1] || "";
+    } else if (t === "CATEGORY") {
+      if (current) result.categories.push(current);
+      current = { name: p[1] || "Category", signal: p[2] || "", items: [], whyMatters: "" };
+    } else if (t === "ITEM" && current) {
+      current.items.push({ headline: p[1] || "", detail: p[2] || "", source: p[3] || "" });
+    } else if (t === "WHYMATTERS" && current) {
+      current.whyMatters = p[1] || "";
+    } else if (t === "EDITOR") {
+      result.editor = { headline: p[1] || "", detail: p[2] || "", source: p[3] || "" };
+    }
+  }
+  if (current) result.categories.push(current);
+  return result;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CARD STATE HELPERS
+// ══════════════════════════════════════════════════════════════════════════════
+
+function initCardState(d) {
+  cardState = {};
+  d.categories.forEach((cat, ci) => {
+    cat.items.forEach((item, ii) => {
+      cardState[`${ci}_${ii}`] = { status: 'pending', headline: item.headline, detail: item.detail, source: item.source };
+    });
+  });
+}
+
+function countStats() {
+  const vals = Object.values(cardState);
+  return {
+    total:   vals.length,
+    kept:    vals.filter(v => v.status === 'keep').length,
+    removed: vals.filter(v => v.status === 'remove').length,
+    pending: vals.filter(v => v.status === 'pending').length,
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════════════════════════
+
+function render() {
+  if (!digest) return;
+  const content = document.getElementById('content');
+  const stats   = countStats();
+  const allDone = stats.pending === 0;
+
+  let html = '';
+
+  // Meta bar
+  html += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+    <span style="font-size:12px;color:var(--muted)">${pubDate}</span>
+    <span class="badge ${isLive ? 'badge-live' : 'badge-kb'}">${isLive ? '● Live search' : '○ Knowledge mode'}</span>
+  </div>`;
+
+  // Summary bar
+  html += `<div class="summary-bar">
+    <div class="summary-stat kept"><strong>${stats.kept}</strong>Kept</div>
+    <div class="summary-stat removed"><strong>${stats.removed}</strong>Removed</div>
+    <div class="summary-stat pending"><strong>${stats.pending}</strong>Pending</div>
+    <div class="summary-stat" style="margin-left:auto;font-size:12px;color:var(--muted);align-self:center;">
+      ${allDone ? '✓ All reviewed — ready to publish' : 'Review each card below'}
+    </div>
+  </div>`;
+
+  // Intro
+  if (digest.intro) {
+    html += `<div class="intro-card">${esc(digest.intro)}</div>`;
+  }
+
+  // Categories
+  digest.categories.forEach((cat, ci) => {
+    const color = CAT_COLORS[cat.name] || DEFAULT_COLOR;
+    html += `<div class="cat-header">
+      <div class="cat-dot" style="background:${color}"></div>
+      <span class="cat-name" style="color:${color}">${esc(cat.name)}</span>
+      <span class="cat-signal">${esc(cat.signal)}</span>
+    </div>`;
+
+    cat.items.forEach((item, ii) => {
+      const key   = `${ci}_${ii}`;
+      const cs    = cardState[key];
+      const cls   = cs.status === 'keep' ? 'kept' : cs.status === 'remove' ? 'removed' : '';
+      const isEditing = cs.editing || false;
+
+      html += `<div class="news-card ${cls} ${isEditing ? 'editing' : ''}" id="card-${key}">
+        <div class="card-top">
+          <div class="card-source" style="color:${color}">${esc(cs.source)}</div>
+          <div class="card-headline">${esc(cs.headline)}</div>
+          <div class="card-detail">${esc(cs.detail)}</div>
+        </div>`;
+
+      if (isEditing) {
+        html += `<div class="edit-form">
+          <div>
+            <label>Headline</label>
+            <input id="edit-h-${key}" value="${esc(cs.headline)}" />
+          </div>
+          <div>
+            <label>Detail</label>
+            <textarea id="edit-d-${key}">${esc(cs.detail)}</textarea>
+          </div>
+          <div>
+            <label>Source</label>
+            <input id="edit-s-${key}" value="${esc(cs.source)}" />
+          </div>
+          <button class="btn btn-sm btn-primary edit-save" onclick="saveEdit('${key}')">✓ Save edits</button>
+        </div>`;
+      }
+
+      html += `<div class="card-actions">
+        <button class="btn btn-sm btn-keep ${cs.status==='keep'?'active':''}" onclick="setStatus('${key}','keep')">✓ Keep</button>
+        <button class="btn btn-sm btn-edit" onclick="toggleEdit('${key}')">${isEditing ? '✕ Cancel' : '✏ Edit'}</button>
+        <button class="btn btn-sm btn-remove ${cs.status==='remove'?'active':''}" onclick="setStatus('${key}','remove')">✕ Remove</button>
+        <span class="card-status">${cs.status === 'keep' ? '✓ Kept' : cs.status === 'remove' ? '✕ Removed' : '— Pending'}</span>
+      </div>
+      </div>`;
+    });
+
+    if (cat.whyMatters) {
+      html += `<div class="cat-why">💡 <em>Why it matters:</em> ${esc(cat.whyMatters)}</div>`;
+    }
+  });
+
+  // Editor's Pick
+  if (digest.editor) {
+    html += `<div class="editors-pick">
+      <div class="editors-pick-label">★ Editor's Pick</div>
+      <div class="editors-pick-headline">${esc(digest.editor.headline)}</div>
+      <div class="editors-pick-detail">${esc(digest.editor.detail)}</div>
+      <span class="editors-pick-source">${esc(digest.editor.source)}</span>
+    </div>`;
+  }
+
+  // Publish panel
+  html += `<div class="publish-panel">
+    <h3>📤 Publish to GitHub Pages</h3>
+    <p>When you're happy with your selections, enter your GitHub details below and click Publish. This will update your public <code>index.html</code> automatically.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+      <input class="publish-input" id="ghUser"  placeholder="GitHub username (e.g. samet-smith)" />
+      <input class="publish-input" id="ghRepo"  placeholder="Repository name (e.g. aied-digest)" />
+      <input class="publish-input" id="ghToken" type="password" placeholder="GitHub Personal Access Token (ghp_…)" />
+    </div>
+    <div class="publish-row">
+      <button class="btn btn-publish" id="btnPublish" onclick="publish()" ${!allDone?'disabled':''}>
+        ${!allDone ? `⏳ Review ${stats.pending} remaining items first` : '🚀 Publish to GitHub Pages'}
+      </button>
+    </div>
+    <div id="pubLog" class="publish-log" style="display:none"></div>
+  </div>`;
+
+  content.innerHTML = html;
+
+  // Restore GitHub fields from localStorage
+  const ghUser  = localStorage.getItem('aied-gh-user');
+  const ghRepo  = localStorage.getItem('aied-gh-repo');
+  const ghToken = localStorage.getItem('aied-gh-token');
+  if (ghUser)  document.getElementById('ghUser').value  = ghUser;
+  if (ghRepo)  document.getElementById('ghRepo').value  = ghRepo;
+  if (ghToken) document.getElementById('ghToken').value = ghToken;
+
+  // Save GitHub fields on change
+  ['ghUser','ghRepo','ghToken'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => localStorage.setItem(`aied-gh-${id.replace('gh','')}`.replace('gh-gh','gh-'), el.value));
+  });
+  document.getElementById('ghUser')?.addEventListener('change',  e => localStorage.setItem('aied-gh-user',  e.target.value));
+  document.getElementById('ghRepo')?.addEventListener('change',  e => localStorage.setItem('aied-gh-repo',  e.target.value));
+  document.getElementById('ghToken')?.addEventListener('change', e => localStorage.setItem('aied-gh-token', e.target.value));
+}
+
+function esc(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INTERACTIONS
+// ══════════════════════════════════════════════════════════════════════════════
+
+function setStatus(key, status) {
+  if (!cardState[key]) return;
+  cardState[key].status = cardState[key].status === status ? 'pending' : status;
+  render();
+}
+
+function toggleEdit(key) {
+  if (!cardState[key]) return;
+  cardState[key].editing = !cardState[key].editing;
+  render();
+  if (cardState[key].editing) {
+    document.getElementById(`edit-h-${key}`)?.focus();
+  }
+}
+
+function saveEdit(key) {
+  if (!cardState[key]) return;
+  const h = document.getElementById(`edit-h-${key}`)?.value.trim();
+  const d = document.getElementById(`edit-d-${key}`)?.value.trim();
+  const s = document.getElementById(`edit-s-${key}`)?.value.trim();
+  if (h) cardState[key].headline = h;
+  if (d) cardState[key].detail   = d;
+  if (s) cardState[key].source   = s;
+  cardState[key].editing = false;
+  cardState[key].status  = 'keep';
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// GENERATE
+// ══════════════════════════════════════════════════════════════════════════════
+
+document.getElementById('btnGenerate').addEventListener('click', generate);
+document.getElementById('btnClear').addEventListener('click', () => {
+  digest = null; cardState = {};
+  document.getElementById('content').innerHTML = `<div class="state-center"><div class="icon">📋</div><h2>Editorial tool ready</h2><p>Click <strong>Generate Digest</strong> to start.</p></div>`;
+  document.getElementById('btnClear').disabled = true;
+});
+
+async function generate() {
+  const key = getKey();
+  if (!key || !key.startsWith('sk-ant-')) {
+    alert('Please enter a valid Anthropic API key (starts with sk-ant-).');
+    apiKeyInput.focus(); return;
+  }
+
+  const lengthPref = document.getElementById('lengthPref').value;
+  const today = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  document.getElementById('btnGenerate').disabled = true;
+  document.getElementById('btnClear').disabled    = true;
+
+  let msgIdx = 0;
+  const setLoading = (msg) => {
+    document.getElementById('content').innerHTML = `
+      <div class="state-center">
+        <div class="icon">⏳</div>
+        <h2>Generating digest…</h2>
+        <div class="loading-msg">${msg}</div>
+      </div>`;
+  };
+  setLoading(LOAD_MSGS[0]);
+  const msgTimer = setInterval(() => { msgIdx = (msgIdx+1) % LOAD_MSGS.length; setLoading(LOAD_MSGS[msgIdx]); }, 3200);
+
+  try {
+    let text; let live = false;
+    const system = buildSystem(lengthPref);
+
+    try {
+      text = await callAPI(system, buildUser(today, true), true, key);
+      live = true;
+    } catch (e1) {
+      console.warn('Live search failed, falling back:', e1.message);
+      text = await callAPI(system, buildUser(today, false), false, key);
+    }
+
+    const parsed = parseDigest(text);
+    if (!parsed.categories.length) throw new Error('No categories parsed — the model may have used an unexpected format. Try again.');
+
+    digest  = parsed;
+    isLive  = live;
+    pubDate = today;
+    initCardState(digest);
+    render();
+    document.getElementById('btnClear').disabled = false;
+
+  } catch (e) {
+    document.getElementById('content').innerHTML = `
+      <div class="error-box">
+        <h3>Error generating digest</h3>
+        <pre>${esc(e.message)}</pre>
+        <button class="btn btn-primary btn-sm" onclick="generate()">Retry</button>
+      </div>`;
+  } finally {
+    clearInterval(msgTimer);
+    document.getElementById('btnGenerate').disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PUBLISH TO GITHUB
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function publish() {
+  const user  = document.getElementById('ghUser')?.value.trim();
+  const repo  = document.getElementById('ghRepo')?.value.trim();
+  const token = document.getElementById('ghToken')?.value.trim();
+
+  if (!user || !repo || !token) {
+    alert('Please fill in your GitHub username, repository name, and Personal Access Token.');
+    return;
+  }
+
+  const log   = document.getElementById('pubLog');
+  const btn   = document.getElementById('btnPublish');
+  log.style.display = 'block';
+  btn.disabled = true;
+
+  const addLog = (msg, cls='') => { log.innerHTML += `<span class="${cls}">${msg}</span>\n`; };
+  log.innerHTML = '';
+  addLog('Building approved digest…');
+
+  // Build approved item list
+  const approved = buildApprovedData();
+  const indexHTML = buildIndexHTML(approved);
+
+  addLog('Pushing index.html to GitHub…');
+
+  try {
+    // Check if file exists (to get SHA for update)
+    let sha = null;
+    const check = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/index.html`, {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (check.ok) { const j = await check.json(); sha = j.sha; }
+
+    const body = {
+      message: `Digest update — ${pubDate}`,
+      content: btoa(unescape(encodeURIComponent(indexHTML))),
+    };
+    if (sha) body.sha = sha;
+
+    const put = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/index.html`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!put.ok) {
+      const err = await put.json().catch(() => ({}));
+      throw new Error(err.message || `GitHub API error ${put.status}`);
+    }
+
+    addLog(`✓ Published successfully!`, 'log-ok');
+    addLog(`🌐 Your page: https://${user}.github.io/${repo}/`, 'log-ok');
+    addLog(`(GitHub Pages may take 1–2 minutes to update)`);
+
+    localStorage.setItem('aied-gh-user',  user);
+    localStorage.setItem('aied-gh-repo',  repo);
+    localStorage.setItem('aied-gh-token', token);
+
+  } catch (e) {
+    addLog(`✕ Error: ${e.message}`, 'log-err');
+    addLog(`Check your token permissions and repository name.`, 'log-err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BUILD APPROVED DATA
+// ══════════════════════════════════════════════════════════════════════════════
+
+function buildApprovedData() {
+  const result = {
+    date: pubDate,
+    live: isLive,
+    intro: digest.intro,
+    editor: digest.editor,
+    categories: [],
+  };
+
+  digest.categories.forEach((cat, ci) => {
+    const items = cat.items
+      .map((item, ii) => ({ ...cardState[`${ci}_${ii}`], _orig: item }))
+      .filter(cs => cs.status !== 'remove');
+
+    if (items.length === 0) return;
+
+    result.categories.push({
+      name:       cat.name,
+      signal:     cat.signal,
+      whyMatters: cat.whyMatters,
+      items: items.map(cs => ({
+        headline: cs.headline,
+        detail:   cs.detail,
+        source:   cs.source,
+      })),
+    });
+  });
+
+  return result;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BUILD PUBLIC index.html
+// ══════════════════════════════════════════════════════════════════════════════
+
+function buildIndexHTML(data) {
+  const CAT_CSS = {
+    "AI Tools & Updates":     "#60a5fa",
+    "Policy & Institutions":  "#a78bfa",
+    "Research & Pedagogy":    "#22d3ee",
+    "Assessment & Integrity": "#fbbf24",
+    "Big Ideas":              "#34d399",
+  };
+  const CAT_ICONS = {
+    "AI Tools & Updates":     "⚙️",
+    "Policy & Institutions":  "🏛️",
+    "Research & Pedagogy":    "📚",
+    "Assessment & Integrity": "🛡️",
+    "Big Ideas":              "💡",
+  };
+
+  const itemCards = (items, color) => items.map(item => `
+    <div class="flip-card">
+      <div class="flip-inner">
+        <div class="flip-front" style="border-top:3px solid ${color}">
+          <div class="card-source" style="color:${color}">${hesc(item.source)}</div>
+          <div class="card-headline">${hesc(item.headline)}</div>
+          <div class="card-hint">Tap to read more →</div>
+        </div>
+        <div class="flip-back" style="border-top:3px solid ${color}">
+          <div class="card-source" style="color:${color}">${hesc(item.source)}</div>
+          <div class="card-headline">${hesc(item.headline)}</div>
+          <div class="card-detail">${hesc(item.detail)}</div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  const catSections = data.categories.map(cat => {
+    const color = CAT_CSS[cat.name] || '#94a3b8';
+    const icon  = CAT_ICONS[cat.name] || '📌';
+    return `
+    <section class="cat-section">
+      <div class="cat-heading" style="border-left:4px solid ${color}">
+        <span class="cat-icon">${icon}</span>
+        <div>
+          <div class="cat-name" style="color:${color}">${hesc(cat.name)}</div>
+          <div class="cat-signal">${hesc(cat.signal)}</div>
+        </div>
+      </div>
+      <div class="cards-grid">${itemCards(cat.items, color)}</div>
+      ${cat.whyMatters ? `<div class="why-matters">💡 <em>Why it matters for faculty developers:</em> ${hesc(cat.whyMatters)}</div>` : ''}
+    </section>`;
+  }).join('');
+
+  const edPick = data.editor ? `
+    <section class="editors-pick-section">
+      <div class="ep-label">★ Editor's Pick</div>
+      <div class="ep-headline">${hesc(data.editor.headline)}</div>
+      <div class="ep-detail">${hesc(data.editor.detail)}</div>
+      <span class="ep-source">${hesc(data.editor.source)}</span>
+    </section>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AI in Education Weekly Digest</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f172a;--surface:#1e293b;--border:#334155;
+  --text:#f1f5f9;--muted:#94a3b8;--accent:#4f46e5;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;padding-bottom:60px}
+a{color:inherit}
+
+/* Header */
+.site-header{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 24px;text-align:center}
+.site-title{font-size:22px;font-weight:800;letter-spacing:-0.02em}
+.site-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.meta-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+.badge-live{background:rgba(34,197,94,0.15);color:#22c55e}
+.badge-kb{background:rgba(96,165,250,0.15);color:#60a5fa}
+.pub-date{font-size:12px;color:var(--muted)}
+
+/* Layout */
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 0}
+
+/* Intro */
+.intro-box{background:var(--surface);border-left:3px solid var(--accent);border-radius:10px;padding:14px 18px;margin-bottom:32px;font-size:14px;line-height:1.7;color:#cbd5e1;font-style:italic}
+
+/* Category */
+.cat-section{margin-bottom:40px}
+.cat-heading{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--surface);border-radius:10px;margin-bottom:16px}
+.cat-icon{font-size:20px;margin-top:2px}
+.cat-name{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px}
+.cat-signal{font-size:13px;color:var(--muted);line-height:1.5}
+.why-matters{margin-top:12px;padding:10px 14px;background:var(--surface);border-radius:8px;font-size:12.5px;color:var(--muted);font-style:italic}
+
+/* Cards grid */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+@media(max-width:600px){.cards-grid{grid-template-columns:1fr}}
+
+/* Flip card */
+.flip-card{perspective:1000px;height:200px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 0.55s cubic-bezier(.4,0,.2,1)}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{
+  position:absolute;inset:0;backface-visibility:hidden;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:18px 16px;
+  display:flex;flex-direction:column;gap:8px;overflow:hidden;
+}
+.flip-back{transform:rotateY(180deg);overflow-y:auto}
+.card-source{font-size:11px;font-weight:700;letter-spacing:0.06em}
+.card-headline{font-size:14px;font-weight:700;line-height:1.4;color:var(--text)}
+.card-hint{margin-top:auto;font-size:11px;color:var(--muted);font-style:italic}
+.card-detail{font-size:12.5px;line-height:1.65;color:#94a3b8}
+
+/* Editor's Pick */
+.editors-pick-section{background:#1e1b4b;border:2px solid var(--accent);border-radius:14px;padding:22px 24px;margin-bottom:24px}
+.ep-label{font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a5b4fc;text-transform:uppercase;margin-bottom:8px}
+.ep-headline{font-size:17px;font-weight:800;color:#e0e7ff;margin-bottom:10px}
+.ep-detail{font-size:14px;line-height:1.7;color:#c7d2fe;margin-bottom:12px}
+.ep-source{display:inline-block;font-size:11px;font-weight:600;color:#a5b4fc;background:rgba(99,102,241,0.2);border-radius:4px;padding:2px 8px}
+
+/* Footer */
+.site-footer{text-align:center;padding:32px 16px 0;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="site-title">AI in Education Weekly Digest</div>
+  <div class="site-sub">Curated for faculty developers &amp; instructional designers in higher education</div>
+  <div class="meta-row">
+    <span class="pub-date">${hesc(data.date)}</span>
+    <span class="badge ${data.live ? 'badge-live' : 'badge-kb'}">${data.live ? '● Live search' : '○ Knowledge mode'}</span>
+  </div>
+</header>
+
+<main class="main">
+  ${data.intro ? `<div class="intro-box">${hesc(data.intro)}</div>` : ''}
+  ${catSections}
+  ${edPick}
+</main>
+
+<footer class="site-footer">
+  AI in Education Digest · ${hesc(data.date)} ·
+  Draws from 70+ curated sources across Tier 1–3 ·
+  Curated by a human editor, generated with AI assistance
+</footer>
+
+<script>
+document.querySelectorAll('.flip-card').forEach(card => {
+  card.addEventListener('click', () => card.classList.toggle('flipped'));
+});
+<\/script>
+</body>
+</html>`;
+}
+
+function hesc(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+</script>
+</body>
+</html>
